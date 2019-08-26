@@ -2,8 +2,7 @@
 #include "cpu_info.h"
 #include "fontset.h"
 #include <string.h>
-
-typedef struct CPU_info CPU_info;
+#include <stdlib.h>
 
 static void load_fonts(CPU_info * cpu){
     for(int i=0;i<16;i++){
@@ -13,8 +12,13 @@ static void load_fonts(CPU_info * cpu){
     }
 }
 
-void clear_cpu(CPU_info * cpu){
+CPU_info * init_cpu(CPU_info * cpu){
     memset(cpu,0,sizeof(CPU_info));
     load_fonts(cpu);
     cpu->PC=0x200;
+    return cpu;
+}
+
+CPU_info * new_cpu(){
+    return init_cpu(malloc(sizeof(CPU_info)));
 }
