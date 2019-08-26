@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 
-struct CPU_info {
+struct _CPU_info {
+    int8_t wait_key;
     uint8_t RAM[4096];
     uint8_t VRAM[2048];
     uint8_t KB[16];
@@ -35,5 +36,7 @@ struct CPU_info {
         };
     };
 };
+
+typedef struct _CPU_info CPU_info;
 
 #endif // CPU_INFO_H_INCLUDED

@@ -33,9 +33,18 @@
 			<Add option="-std=c11" />
 			<Add directory="include" />
 		</Compiler>
-		<Unit filename="include/cpu.h" />
-		<Unit filename="include/cpu_info.h" />
-		<Unit filename="include/fontset.h" />
+		<Unit filename="include/cpu.h">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="include/cpu_info.h">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="include/fontset.h">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="include/instruction_data.h">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/cpu.c">
 			<Option compilerVar="CC" />
 		</Unit>
