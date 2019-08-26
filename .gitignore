@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+#Codeblocks files
+*.bak
+*.layout
+*.depend
+*.save
