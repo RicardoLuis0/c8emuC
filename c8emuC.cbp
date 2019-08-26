@@ -30,8 +30,11 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-std=c11" />
+			<Add directory="include" />
 		</Compiler>
 		<Unit filename="include/cpu.h" />
+		<Unit filename="include/cpu_info.h" />
 		<Unit filename="src/cpu.c">
 			<Option compilerVar="CC" />
 		</Unit>
