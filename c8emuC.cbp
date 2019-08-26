@@ -35,7 +35,11 @@
 		</Compiler>
 		<Unit filename="include/cpu.h" />
 		<Unit filename="include/cpu_info.h" />
+		<Unit filename="include/fontset.h" />
 		<Unit filename="src/cpu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/fontset.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/main.c">
