@@ -3,6 +3,7 @@
 #include "fontset.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "instruction_data.h"
 
 static void load_fonts(CPU_info * cpu){
@@ -25,7 +26,13 @@ CPU_info * new_cpu(){
     return init_cpu(malloc(sizeof(CPU_info)));
 }
 
-void execute_instruction(CPU_info * cpu){
+int execute_instruction(CPU_info * cpu){
+    if(cpu->wait_key>=0)return 0;
+    if(cpu->DT)cpu->DT--;
+    if(cpu->ST){
+        printf("\a");//TODO replace with sdl sound stuff
+        cpu->ST--;
+    }
     instruction_data inst={
         .section12=cpu->RAM[cpu->PC],
         .section34=cpu->RAM[cpu->PC+1],
@@ -71,6 +78,7 @@ void execute_instruction(CPU_info * cpu){
             if(cpu->V[inst.section2]==cpu->V[inst.section3])cpu->PC+=2;
         }else{
             //INVALID_OPERATION
+            return 0;
         }
         break;
     case 0x6://MOV VX,NN
@@ -126,7 +134,7 @@ void execute_instruction(CPU_info * cpu){
             break;
         default:
             //INVALID_OPERATION
-            break;
+            return 0;
         }
         break;
     case 0x9://SNE VX,VY
@@ -135,6 +143,7 @@ void execute_instruction(CPU_info * cpu){
             if(cpu->V[inst.section2]!=cpu->V[inst.section3])cpu->PC+=2;
         }else{
             //INVALID_OPERATION
+            return 0;
         }
         break;
     case 0xA://MOV I,NNN
@@ -184,7 +193,7 @@ void execute_instruction(CPU_info * cpu){
             break;
         default:
             //INVALID_OPERATION
-            break;
+            return 0;
         }
         break;
     case 0xF:
@@ -234,8 +243,42 @@ void execute_instruction(CPU_info * cpu){
             break;
         default:
             //INVALID_OPERATION
-            break;
+            return 0;
         }
         break;
     }
+    return 1;
+}
+
+int load_program(CPU_info * cpu,const char * file_path){
+    static const int MAX_LENGTH = 3584;// 4096 - 0x200 ( RAM size - initial PC position)
+    FILE * f=fopen(file_path,"rb");
+    if(f){
+        fseek(f,0,SEEK_END);
+        int len=ftell(f);
+        if(len>MAX_LENGTH){
+            fclose(f);
+            return 0;
+        }
+        fseek(f,0,SEEK_SET);
+        fread(cpu->RAM+0x200,len,1,f);
+        fclose(f);
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+void keydown(CPU_info * cpu, uint8_t key){
+    if(key<0||key>15)return;
+    cpu->KB[key]=1;
+    if(cpu->wait_key>=0){
+        cpu->V[cpu->wait_key]=key;
+        cpu->wait_key=-1;
+    }
+}
+
+void keyup(CPU_info * cpu, uint8_t key){
+    if(key<0||key>15)return;
+    cpu->KB[key]=0;
 }
