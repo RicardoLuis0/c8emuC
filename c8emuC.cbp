@@ -51,10 +51,16 @@
 		<Unit filename="include/instruction_data.h">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="include/io_control.h">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/cpu.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/fontset.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/io_control.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/main.c">

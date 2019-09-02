@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#include "cpu.h"
+
+CPU_info * init_cpu(CPU_info *);//initializes struct data, returns same pointer that was passed to it
+
 struct _CPU_info {
     int8_t wait_key;
     uint8_t RAM[4096];
@@ -36,7 +40,5 @@ struct _CPU_info {
         };
     };
 };
-
-typedef struct _CPU_info CPU_info;
 
 #endif // CPU_INFO_H_INCLUDED

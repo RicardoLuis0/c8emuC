@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "instruction_data.h"
+#include "cpu_info.h"
 
 static void load_fonts(CPU_info * cpu){
     for(int i=0;i<16;i++){
@@ -24,6 +25,10 @@ CPU_info * init_cpu(CPU_info * cpu){
 
 CPU_info * new_cpu(){
     return init_cpu(malloc(sizeof(CPU_info)));
+}
+
+void delete_cpu(CPU_info * cpu){
+    free(cpu);
 }
 
 int execute_instruction(CPU_info * cpu){
