@@ -97,6 +97,15 @@ int poll_io(CPU_info * cpu){
     return 0;
 }
 
+int poll_noio(){
+    for(SDL_Event e;SDL_PollEvent(&e);){
+        if(e.type==SDL_QUIT){
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void exit_io(){
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

@@ -11,6 +11,8 @@ void draw(CPU_info * cpu);
 
 int poll_io(CPU_info * cpu);
 
+int poll_noio();
+
 void exit_io();
 
 #endif // IO_CONTROL_H_INCLUDED

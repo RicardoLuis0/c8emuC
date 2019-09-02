@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="roms/tetris" />
+				<Option parameters="-debug roms/tetris" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -39,6 +39,9 @@
 			<Add option="-lSDL2main" />
 			<Add option="-lSDL2" />
 		</Linker>
+		<Unit filename="include/command_handler.h">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="include/cpu.h">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -52,6 +55,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="include/io_control.h">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/command_handler.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/cpu.c">
