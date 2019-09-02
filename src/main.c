@@ -67,7 +67,11 @@ void print_usage(){
     printf("usage:\n  c8emu <ROM>");
 }
 
+
+
 int main(int argc,char ** argv){
+    int target_fps=60;//frames per second, affects counters
+    int target_ops=60;//operations per second (speed of processor in hz)
     if(argc<2){
         printf("Too few arguments\n");
         print_usage();
@@ -88,23 +92,29 @@ int main(int argc,char ** argv){
             SDL_CreateWindowAndRenderer(640,320,0,&window,&renderer);
             SDL_RenderPresent(renderer);
             while(1){
-                for(SDL_Event e;SDL_PollEvent(&e);){
-                    switch(e.type){
-                    case SDL_QUIT:
-                        goto endloop;
-                    case SDL_KEYDOWN:
-                        if(e.key.keysym.sym==SDLK_ESCAPE)goto endloop;
-                        keydown(&cpu,get_key(e.key.keysym.sym));
-                        break;
-                    case SDL_KEYUP:
-                        keyup(&cpu,get_key(e.key.keysym.sym));
-                        break;
-                    default:
-                        break;
+                if((SDL_GetTicks()%(1000/target_ops))==0){
+                    for(SDL_Event e;SDL_PollEvent(&e);){
+                        switch(e.type){
+                        case SDL_QUIT:
+                            goto endloop;
+                        case SDL_KEYDOWN:
+                            if(e.key.keysym.sym==SDLK_ESCAPE)goto endloop;
+                            keydown(&cpu,get_key(e.key.keysym.sym));
+                            break;
+                        case SDL_KEYUP:
+                            keyup(&cpu,get_key(e.key.keysym.sym));
+                            break;
+                        default:
+                            break;
+                        }
                     }
+                    execute_instruction(&cpu);
                 }
-                execute_instruction(&cpu);
-                draw(renderer,&cpu);
+                if((SDL_GetTicks()%(1000/target_fps))==0){
+                    execute_instruction(&cpu);
+                    draw(renderer,&cpu);
+                    delay_tick(&cpu);
+                }
             }
         endloop:
             SDL_Quit();

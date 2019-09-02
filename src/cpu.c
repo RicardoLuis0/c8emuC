@@ -28,11 +28,6 @@ CPU_info * new_cpu(){
 
 int execute_instruction(CPU_info * cpu){
     if(cpu->wait_key>=0)return 0;
-    if(cpu->DT)cpu->DT--;
-    if(cpu->ST){
-        printf("\a");//TODO replace with sdl sound stuff
-        cpu->ST--;
-    }
     instruction_data inst={
         .section12=cpu->RAM[cpu->PC],
         .section34=cpu->RAM[cpu->PC+1],
@@ -281,4 +276,12 @@ void keydown(CPU_info * cpu, uint8_t key){
 void keyup(CPU_info * cpu, uint8_t key){
     if(key<0||key>15)return;
     cpu->KB[key]=0;
+}
+
+void delay_tick(CPU_info * cpu){
+    if(cpu->DT)cpu->DT--;
+    if(cpu->ST){
+        printf("\a");//TODO replace with sdl sound stuff
+        cpu->ST--;
+    }
 }

@@ -9,4 +9,5 @@ int execute_instruction(CPU_info * cpu);
 int load_program(CPU_info * cpu,const char * file_path);
 void keyup(CPU_info * cpu, uint8_t key);
 void keydown(CPU_info * cpu, uint8_t key);
+void delay_tick(CPU_info * cpu);
 #endif // CPU_H_INCLUDED
