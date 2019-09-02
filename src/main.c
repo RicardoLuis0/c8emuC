@@ -70,8 +70,8 @@ void print_usage(){
 
 
 int main(int argc,char ** argv){
-    int target_fps=10;//frames per second, affects counters
-    int target_ops=10;//operations per second (speed of processor in hz)
+    int target_fps=60;//frames per second, affects counters
+    int target_ops=60;//operations per second (speed of processor in hz)
     int frame_time=1000/target_fps;
     int cpu_time=1000/target_ops;
     if(argc<2){
