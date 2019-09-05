@@ -56,3 +56,6 @@ dkms.conf
 *.layout
 *.depend
 *.save
+
+#c8 stuff
+*.c8asm
