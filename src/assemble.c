@@ -102,6 +102,11 @@ typedef struct _line{
 int assemble(const char * in,const char * out){
     line_array arr=read_file_into_line_array(in);
     if(arr.data){
+        for(int i=0;i<arr.lines;i++){
+            char * temp=strip_whitespace_comments(arr.data[i]);
+            free(arr.data[i]);
+            arr.data[i]=temp;
+        }
         free_line_array(arr);
         printf("Assembler not implemented\n");
         return 0;
