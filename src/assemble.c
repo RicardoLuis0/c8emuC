@@ -1,6 +1,7 @@
 #include "assemble.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct _line_data{
     int lines;
@@ -62,12 +63,45 @@ static line_array read_file_into_line_array(const char * filename){
     return (line_array){lines,data.lines};
 }
 
+static char * strip_whitespace_comments(const char * in){
+    const char * start=in;
+    while(*start==' '||*start=='\t')start++;//skip trailing whitespace
+    const char * end=start;
+    while(*end!=0&&*end!=';')end++;//find end of string
+    while(end>start&&end[-1]==' ')end--;//skip trailing whitespace
+    int len=end-start;
+    if(len>0){
+        char * temp=calloc(len+1,sizeof(char));
+        strncpy(temp,start,len);
+        return temp;
+    }
+    return NULL;
+}
+
+typedef struct _label_data{
+    char * label_name;
+    int line;
+    int position;//will be -1, set during line parsing
+    struct _label_data * next;
+} label_data;
+
+static label_data * find_label(label_data * labels,const char * name){
+    //TODO
+    return NULL;
+}
+
+static label_data * parse_labels(line_array arr){
+    //TODO
+    return NULL;
+}
+
+typedef struct _line{
+    
+}line;
+
 int assemble(const char * in,const char * out){
     line_array arr=read_file_into_line_array(in);
     if(arr.data){
-        for(int i=0;i<arr.lines;i++){
-            printf("%s\n",arr.data[i]);
-        }
         free_line_array(arr);
         printf("Assembler not implemented\n");
         return 0;
