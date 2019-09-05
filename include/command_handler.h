@@ -28,4 +28,7 @@ debug_data * new_debug_data();
 int execute_command(debug_data * data);
 
 void calc_times(debug_data * data);
+
+void break_proccess(debug_data * data);
+
 #endif // COMMAND_HANDLER_H_INCLUDED

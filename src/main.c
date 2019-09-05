@@ -54,6 +54,7 @@ int debug(const char * filename){
         }
         printf(">");
         while(1){
+            if(has_focus())break_proccess(data);
             if(!has_focus()||data->paused){//if doesn't have focus, or emu is paused, don't run cycle
                 if(poll_noio())break;
             }else{
@@ -94,6 +95,10 @@ int debug(const char * filename){
             }
         }
         exit_io();
+        size_t l=strlen(data->buffer)+1;
+        for(size_t i=0;i<l;i++){
+            printf("\b \b");
+        }
     }else{
         printf("Failed to load ROM (inexistent or too large)\n");
     }
