@@ -63,11 +63,25 @@ static line_array read_file_into_line_array(const char * filename){
     return (line_array){lines,data.lines};
 }
 
+static int only_has_valid(char * str,int (*valid_predicate)(char c),int size){
+    for(int i=0;i<size&&*str!='\0';i++,str++){
+        if(!valid_predicate(*str))return 0;
+    }
+    return 1;
+}
+
+static int has_char(char * str,char c,int size){
+    for(int i=0;i<size&&*str!='\0';i++,str++){
+        if(*str==c)return 1;
+    }
+    return 0;
+}
+
 static char * strip_whitespace_comments(const char * in){
     const char * start=in;
     while(*start==' '||*start=='\t')start++;//skip trailing whitespace
     const char * end=start;
-    while(*end!=0&&*end!=';')end++;//find end of string
+    while(*end!='\0'&&*end!=';')end++;//find end of string
     while(end>start&&end[-1]==' ')end--;//skip trailing whitespace
     int len=end-start;
     if(len>0){
@@ -75,25 +89,69 @@ static char * strip_whitespace_comments(const char * in){
         strncpy(temp,start,len);
         return temp;
     }
-    return NULL;
+    return calloc(1,sizeof(char));
 }
 
 typedef struct _label_data{
-    char * label_name;
+    char * name;
     int line;
     int position;//will be -1, set during line parsing
     struct _label_data * next;
 } label_data;
 
-static label_data * find_label(label_data * labels,const char * name){
-    //TODO
-    return NULL;
+static label_data * add_label(label_data * parent,int line,char * name){
+    label_data * temp=calloc(1,sizeof(label_data));
+    temp->name=name;
+    temp->line=line;
+    temp->position=-1;
+    temp->next=parent;
+    return temp;
+}
+
+static label_data * find_label_name(label_data * labels,const char * name,size_t n){
+    while(labels!=NULL){
+        if(strncmp(name,labels->name,n)==0)return labels;//label found
+        labels=labels->next;
+    }
+    return NULL;//no label found
+}
+
+static label_data * find_label_line(label_data * labels,int line){
+    while(labels!=NULL){
+        if(line==labels->line)return labels;//label found
+        labels=labels->next;
+    }
+    return NULL;//no label found
+}
+
+static int is_valid_label_char(char c){
+    return (c>'a'&&c<'z')||(c>'A'&&c<'Z')||c=='_';
 }
 
 static label_data * parse_labels(line_array arr){
-    //TODO
-    return NULL;
+    label_data * labels=NULL;
+    for(int i=0;i<arr.lines;i++){
+        int len=strlen(arr.data[i]);
+        if(arr.data[i][len-1]==':'){
+            char * temp=calloc(len,sizeof(char));
+            strncpy(temp,arr.data[i],len-1);
+            if(only_has_valid(temp,is_valid_label_char,len)){
+                if(!find_label_name(labels,temp,len)){
+                    labels=add_label(labels,i,temp);
+                }else{
+                    printf("line %d: duplicate label '%s' ignored",i,temp);
+                }
+            }else{
+                printf("line %d: invalid label name '%s'",i,temp);
+            }
+        }
+    }
+    return labels;
 }
+
+typedef struct _instruction{
+    
+}instruction;
 
 typedef struct _line{
     
