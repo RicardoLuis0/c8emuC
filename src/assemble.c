@@ -26,7 +26,7 @@ static line_data count_lines(FILE * f){
         }
     }
     fseek(f,0,SEEK_SET);
-    return (line_data){line_count,max_len};
+    return (line_data){line_count,max_len+1};
 }
 
 static void free_line_array(line_array arr){
@@ -65,6 +65,9 @@ static line_array read_file_into_line_array(const char * filename){
 int assemble(const char * in,const char * out){
     line_array arr=read_file_into_line_array(in);
     if(arr.data){
+        for(int i=0;i<arr.lines;i++){
+            printf("%s\n",arr.data[i]);
+        }
         free_line_array(arr);
         printf("Assembler not implemented\n");
         return 0;
