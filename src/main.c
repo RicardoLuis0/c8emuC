@@ -18,88 +18,88 @@ int execute(const char * filename){
     int cpu_time=1000/target_ops;
     CPU_info * cpu=new_cpu();
     if(load_program(cpu,filename)){
-        if(init_io())return 1;
+        if(!init_io()){
+            delete_cpu(cpu);
+            return 1;
+        }
         while(1){
-            if(check_time(cpu_time)){
-                if(poll_io(cpu))break;
-                execute_instruction(cpu);
-            }
-            if(check_time(frame_time)){
-                draw(cpu);
-                delay_tick(cpu);
+            if(!has_focus()){//if doesn't have focus, don't run cycle
+                if(poll_noio())break;
+            }else{
+                if(check_time(cpu_time)){
+                    if(poll_io(cpu))break;
+                    execute_instruction(cpu);
+                }
+                if(check_time(frame_time)){
+                    draw(cpu);
+                    delay_tick(cpu);
+                }
             }
         }
         exit_io();
-        delete_cpu(cpu);
     }else{
         printf("Failed to load ROM (inexistent or too large)\n");
     }
+    delete_cpu(cpu);
     return 0;
 }
 
 int debug(const char * filename){
-    
-    debug_data data={
-        .paused=1,
-        .buffer={},
-        .buffer_pos=0,
-        .target_fps=60,//frames per second, affects counters
-        .target_ops=60,//operations per second (speed of processor in hz)
-        .frame_time=1000/60,
-        .cpu_time=1000/60,
-        .cpu=new_cpu(),
-        .echo=1,
-    };
-    if(load_program(data.cpu,filename)){
-        if(init_io())return 1;
+    debug_data * data=new_debug_data();
+    if(load_program(data->cpu,filename)){
+        if(!init_io()){
+            delete_cpu(data->cpu);
+            free(data);
+            return 1;
+        }
         printf(">");
         while(1){
-            if(data.paused){
+            if(!has_focus()||data->paused){//if doesn't have focus, or emu is paused, don't run cycle
                 if(poll_noio())break;
             }else{
-                if(check_time(data.cpu_time)){
-                    if(poll_io(data.cpu))break;
-                    execute_instruction(data.cpu);
+                if(check_time(data->cpu_time)){
+                    if(poll_io(data->cpu))break;
+                    execute_instruction(data->cpu);
                 }
-                if(check_time(data.frame_time)){
-                    draw(data.cpu);
-                    delay_tick(data.cpu);
+                if(check_time(data->frame_time)){
+                    draw(data->cpu);
+                    delay_tick(data->cpu);
                 }
             }
             if(_kbhit()){
                 char c=_getch();
                 if(c=='\b'){
-                    if(data.buffer_pos>0){
-                        data.buffer[--data.buffer_pos]=0;
+                    if(data->buffer_pos>0){
+                        data->buffer[--data->buffer_pos]=0;
                         printf("\b \b");
                     }
                 }else if(c!='\n'&&c!='\r'){
-                    if(data.buffer_pos<(MAX_BUFFER-1)){
+                    if(data->buffer_pos<(MAX_BUFFER-1)){
                         printf("%c",c);
-                        data.buffer[data.buffer_pos++]=c;
-                        data.buffer[data.buffer_pos]=0;
+                        data->buffer[data->buffer_pos++]=c;
+                        data->buffer[data->buffer_pos]=0;
                     }
                 }else{//proccess command
-                    size_t l=strlen(data.buffer)+1;
-                    if(data.echo){
+                    size_t l=strlen(data->buffer)+1;
+                    if(data->echo){
                         printf("\n");
                     }else{
                         for(size_t i=0;i<l;i++){
                             printf("\b \b");
                         }
                     }
-                    if(execute_command(&data)) break;
+                    if(execute_command(data)) break;
                     printf(">");
                 }
             }
         }
         exit_io();
-        delete_cpu(data.cpu);
     }else{
         printf("Failed to load ROM (inexistent or too large)\n");
     }
+    delete_cpu(data->cpu);
+    free(data);
     return 0;
-    
 }
 
 int main(int argc,char ** argv){

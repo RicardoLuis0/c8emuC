@@ -51,14 +51,18 @@ int check_time(int msdelay){
     return (SDL_GetTicks()%msdelay)==0;
 }
 
+int has_focus(){
+    return SDL_GetWindowFlags(window)&SDL_WINDOW_INPUT_FOCUS;
+}
+
 int init_io(){
     if(SDL_Init(SDL_INIT_VIDEO)!=0){
         printf("Error.\n >Error while Initializing SDL: %s\n",SDL_GetError());
-        return 1;
+        return 0;
     }
     SDL_CreateWindowAndRenderer(640,320,0,&window,&renderer);
     SDL_RenderPresent(renderer);
-    return 0;
+    return 1;
 }
 
 void draw(CPU_info * cpu){

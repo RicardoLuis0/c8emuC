@@ -8,6 +8,18 @@ char * strlcpy(char *dst, const char *src, size_t size){
     return dst;
 }
 
+debug_data * new_debug_data(){
+    debug_data * data=calloc(1,sizeof(debug_data));
+    data->paused=1;
+    data->target_fps=60;//frames per second, affects counters
+    data->target_ops=60;//operations per second (speed of processor in hz)
+    data->frame_time=1000/60;
+    data->cpu_time=1000/60;
+    data->cpu=new_cpu();
+    data->echo=1;
+    return data;
+}
+
 #define MAX_ARGS 5
 
 static int find_command(const char cmd[MAX_BUFFER]);
