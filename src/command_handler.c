@@ -113,17 +113,17 @@ int break_cmd(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
         }
         for(int i=0;i<data->break_count;i++){
             if(data->breaks[i]==num){
-                printf("Could not set breakpoint 0x%x , it's already set\n",num);
+                printf("Could not set breakpoint 0x%X , it's already set\n",num);
                 return 0;
             }
         }
         if(data->break_count==MAX_BREAKS){
-            printf("Could not set breakpoint 0x%x, max number of breakpoints (%d) reached\n",num,MAX_BREAKS);
+            printf("Could not set breakpoint 0x%X, max number of breakpoints (%d) reached\n",num,MAX_BREAKS);
             return 0;
         }
         //set breakpoint
         data->breaks[data->break_count++]=num;
-        printf("Breakpoint 0x%x set (%d/%d)\n",num,data->break_count,MAX_BREAKS);
+        printf("Breakpoint 0x%X set (%d/%d)\n",num,data->break_count,MAX_BREAKS);
     }else if(strcmp(cmd_data[1],"unset")==0){
         int num=parse_number(cmd_data[2]);
         if(num==-1){
@@ -139,10 +139,10 @@ int break_cmd(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
             }
         }
         if(move==0){
-            printf("Could not unset breakpoint 0x%x , it's not set\n",num);
+            printf("Could not unset breakpoint 0x%X , it's not set\n",num);
         }else{
             data->break_count--;
-            printf("Breakpoint 0x%x unset\n",num);
+            printf("Breakpoint 0x%X unset\n",num);
         }
     }else if(strcmp(cmd_data[1],"clear")==0){
         if(data->break_count>0){
@@ -155,7 +155,7 @@ int break_cmd(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
         if(data->break_count>0){
             printf("Breakpoints (%d/%d):\n\n",data->break_count,MAX_BREAKS);
             for(int i=0;i<data->break_count;i++){
-                printf(" #%d = 0x%x\n",i+1,data->breaks[i]);
+                printf(" #%d = 0x%X\n",i+1,data->breaks[i]);
             }
         }else{
             printf("Could not list breakpoints, there are no breakpoints set\n");
@@ -175,7 +175,7 @@ void break_proccess(debug_data * data){
                 printf("\b \b");//erase all characters
             }
             data->paused=1;
-            printf("Breakpoint (0x%x) triggered, Pausing Execution\n>%s",data->cpu->PC,data->buffer);
+            printf("Breakpoint (0x%X) triggered, Pausing Execution\n>%s",data->cpu->PC,data->buffer);
             return;
         }
     }
