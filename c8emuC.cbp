@@ -67,6 +67,7 @@
 			<Add option="-lSDL2" />
 		</Linker>
 		<Unit filename="include/assemble.h">
+			<Option compilerVar="CC" />
 			<Option target="AssemblerDebug" />
 			<Option target="AssemblerRelease" />
 		</Unit>
@@ -77,6 +78,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="include/cpu_info.h">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="include/disassemble.h">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="include/fontset.h">
@@ -107,6 +111,9 @@
 			<Option compilerVar="CC" />
 			<Option target="EmuDebug" />
 			<Option target="EmuRelease" />
+		</Unit>
+		<Unit filename="src/disassemble.c">
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/emu_main.c">
 			<Option compilerVar="CC" />
