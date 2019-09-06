@@ -1,0 +1,43 @@
+#ifndef INSTRUCTIONS_H_INCLUDED
+#define INSTRUCTIONS_H_INCLUDED
+
+typedef enum {
+    DATA,
+    //SYS,
+    CLS,
+    RET,
+    JMP,
+    JMP_V0,
+    CALL,
+    SE,
+    SE_REG,
+    SNE,
+    SNE_REG,
+    SKP,
+    SNKP,
+    KEY,
+    MOV,
+    MOV_REG,
+    MOV_I,
+    MOV_REG_DT,
+    MOV_DT,
+    MOV_ST,
+    ADD,
+    ADD_REG,
+    ADD_I,
+    SUB,
+    RSB,
+    OR,
+    AND,
+    XOR,
+    SHR,
+    SHL,
+    RND,
+    DRW,
+    LDFNT,
+    BCD,
+    STR,
+    LDR,
+} instruction_t;
+
+#endif // INSTRUCTIONS_H_INCLUDED

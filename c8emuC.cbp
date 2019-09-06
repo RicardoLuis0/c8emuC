@@ -89,7 +89,13 @@
 		<Unit filename="include/instruction_data.h">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="include/instructions.h">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="include/io_control.h">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="include/util.h">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/assemble.c">
@@ -129,6 +135,9 @@
 			<Option compilerVar="CC" />
 			<Option target="EmuDebug" />
 			<Option target="EmuRelease" />
+		</Unit>
+		<Unit filename="src/util.c">
+			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
 			<code_completion />

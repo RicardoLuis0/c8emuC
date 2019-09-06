@@ -2,12 +2,7 @@
 #include "cpu_info.h"
 #include <stdio.h>
 #include <string.h>
-
-char * strlcpy(char *dst, const char *src, size_t size){
-    strncpy(dst,src,size-1);
-    dst[size-1]=0;
-    return dst;
-}
+#include "util.h"
 
 debug_data * new_debug_data(){
     debug_data * data=calloc(1,sizeof(debug_data));
@@ -34,7 +29,7 @@ static void split_cmd(const char cmd[MAX_BUFFER],char arr[MAX_ARGS][MAX_BUFFER])
         }else{
         }
         if(tmp){
-            strlcpy(arr[i],cmd,tmp-cmd+1);
+            strlncpy(arr[i],cmd,tmp-cmd+1);
             while(tmp[0]!=0&&tmp[1]==' ')tmp++;//skip multiple spaces
             if(*tmp==0)return;
             cmd=++tmp;
@@ -86,22 +81,6 @@ int pause(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
     printf("Pausing Execution\n");
     data->paused=1;
     return 0;
-}
-
-int parse_number(const char * str){
-    if(str[0]>='0'&&str[0]<='9'){
-        char * endptr;
-        int num=-1;
-        if(str[0]=='0'&&str[1]=='x'){//if starts with 0x, parse as base16(hexadecimal), else parse as base10(decimal)
-            num=strtol(str+2,&endptr,16);
-        }else{
-            num=strtol(str,&endptr,10);
-        }
-        if(*endptr==0){
-            return num;
-        }//if there's non-numbers in the string, fail
-    }
-    return -1;//fail
 }
 
 int break_cmd(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){

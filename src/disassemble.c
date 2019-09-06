@@ -15,8 +15,8 @@ disassembled_instruction disassemble_instruction(uint16_t rawbytes){
             //return from procedure
             return (disassembled_instruction){RET,inst};
         default://SYS NNN
-            //syscall
-            return (disassembled_instruction){SYS,inst};
+            //syscall/data
+            return (disassembled_instruction){DATA,inst};
         }
     case 0x1://JMP NNN
         //jump
@@ -148,9 +148,11 @@ disassembled_instruction disassemble_instruction(uint16_t rawbytes){
 
 void get_instruction_str(disassembled_instruction inst,char * into,size_t size){
     switch(inst.type){
+    /*
     case SYS://SYS NNN
         snprintf(into,size,"(0x%04X) SYS(NOP) 0x%03X\n",inst.data.whole,inst.data.section234);
         break;
+    */
     case CLS://CLS
         snprintf(into,size,"(0x%04X) CLS\n",inst.data.whole);
         break;
@@ -160,8 +162,8 @@ void get_instruction_str(disassembled_instruction inst,char * into,size_t size){
     case JMP://JMP NNN
         snprintf(into,size,"(0x%04X) JMP 0x%03X\n",inst.data.whole,inst.data.section234);
         break;
-    case JMP_V0://JMP V0,NN
-        snprintf(into,size,"(0x%04X) JMP V%01X, 0x%02X\n",inst.data.whole,inst.data.section2,inst.data.section34);
+    case JMP_V0://JMP V0,NNN
+        snprintf(into,size,"(0x%04X) JMP V0, 0x%03X\n",inst.data.whole,inst.data.section234);
         break;
     case CALL://CALL NNN
         snprintf(into,size,"(0x%04X) CALL 0x%03X\n",inst.data.whole,inst.data.section234);
