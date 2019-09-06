@@ -2,18 +2,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
-typedef struct _line_data{
+typedef struct _file_line_info{
     int lines;
     int max_len;
-} line_data;
+} file_line_info;
 
 typedef struct _line_array{
     char ** data;
     int lines;
 } line_array;
 
-static line_data count_lines(FILE * f){
+static file_line_info count_lines(FILE * f){
     int line_count=1;
     int len=0;
     int max_len=0;
@@ -27,7 +28,7 @@ static line_data count_lines(FILE * f){
         }
     }
     fseek(f,0,SEEK_SET);
-    return (line_data){line_count,max_len+1};
+    return (file_line_info){line_count,max_len+1};
 }
 
 static void free_line_array(line_array arr){
@@ -43,7 +44,7 @@ static void free_line_array(line_array arr){
 static line_array read_file_into_line_array(const char * filename){
     FILE * f=fopen(filename,"r");
     if(!f)return (line_array){NULL,-1};
-    line_data data=count_lines(f);
+    file_line_info data=count_lines(f);
     char ** lines=calloc(data.lines,sizeof(char*));
     //char * buffer=calloc(data.max_len,sizeof(char));
     int line=0;
@@ -96,15 +97,17 @@ typedef struct _label_data{
     char * name;
     int line;
     int position;//will be -1, set during line parsing
+    struct _line_data * parent;
     struct _label_data * next;
 } label_data;
 
-static label_data * add_label(label_data * parent,int line,char * name){
+static label_data * add_label(label_data * other,int line,char * name){
     label_data * temp=calloc(1,sizeof(label_data));
     temp->name=name;
     temp->line=line;
     temp->position=-1;
-    temp->next=parent;
+    temp->parent=NULL;
+    temp->next=other;
     return temp;
 }
 
@@ -124,38 +127,99 @@ static label_data * find_label_line(label_data * labels,int line){
     return NULL;//no label found
 }
 
-static int is_valid_label_char(char c){
-    return (c>'a'&&c<'z')||(c>'A'&&c<'Z')||c=='_';
+static int is_valid_label_start_char(char c){
+    return (c>='a'&&c<='z')||(c>='A'&&c<='Z')||c=='_';
 }
 
-static label_data * parse_labels(line_array arr){
-    label_data * labels=NULL;
-    for(int i=0;i<arr.lines;i++){
-        int len=strlen(arr.data[i]);
-        if(arr.data[i][len-1]==':'){
-            char * temp=calloc(len,sizeof(char));
-            strncpy(temp,arr.data[i],len-1);
-            if(only_has_valid(temp,is_valid_label_char,len)){
-                if(!find_label_name(labels,temp,len)){
-                    labels=add_label(labels,i,temp);
-                }else{
-                    printf("line %d: duplicate label '%s' ignored",i,temp);
-                }
+static int is_valid_label_char(char c){
+    return is_valid_label_start_char(c)||(c>='0'&&c<='9');
+}
+
+static int parse_label(const char * str,int line,label_data ** labels){
+    int len=strlen(str);
+    if(str[len-1]==':'){
+        char * temp=calloc(len,sizeof(char));
+        strncpy(temp,str,len-1);
+        if(only_has_valid(temp,is_valid_label_char,len)&&is_valid_label_start_char(temp[0])){
+            if(!find_label_name(*labels,temp,len)){
+                (*labels)=add_label(*labels,line,temp);
+                return 1;//success
             }else{
-                printf("line %d: invalid label name '%s'",i,temp);
+                printf("line %d: duplicate label '%s' ignored",line,temp);
             }
+        }else{
+            printf("line %d: invalid label name '%s'",line,temp);
         }
     }
-    return labels;
+    return 0;//fail
 }
 
-typedef struct _instruction{
+typedef struct _unresolved_label_jump_instruction{
+    const char * label;
     
-}instruction;
+} unresolved_label_jump_instruction;
 
-typedef struct _line{
-    
-}line;
+typedef struct _unresolved_instruction{
+    enum{
+        LABEL_JUMP,
+    }type;
+    union{
+        unresolved_label_jump_instruction * label_jump;
+    };
+} unresolved_instruction;
+
+typedef struct _resolved_instruction{
+    uint16_t code;
+} resolved_instruction;
+
+typedef struct _line_data{
+    enum {
+        LINE_RESOLVED_INSTRUCTION,
+        LINE_UNRESOLVED_INSTRUCTION,
+        LINE_LABEL,
+    } type;
+    union{
+        resolved_instruction * resolved;
+        unresolved_instruction * unresolved;
+        label_data * label;
+    };
+    int line;
+    int pos;
+    struct _line_data * next;
+} line_data;
+
+static int parse_line(const char * str,int line,label_data * labels,line_data ** head){
+    return 0;
+}
+
+static void parse_lines(line_array arr){
+    label_data * labels=NULL;
+    line_data * start=NULL;
+    line_data * head=NULL;
+    int pos=0x200;
+    for(int i=0;i<arr.lines;i++){
+        if(!parse_label(arr.data[i],i,&labels)){//try to parse label line
+            line_data * temp=calloc(0,sizeof(line_data));
+            labels->parent=temp;
+            labels->position=pos;
+            temp->type=LINE_LABEL;
+            temp->label=labels;
+            temp->line=i;
+            temp->pos=pos;
+            if(head){
+                head->next=temp;
+                head=temp;
+            }else{
+                head=start=temp;
+            }
+        }else if(!parse_line(arr.data[i],i,labels,&head)){//try to parse code line
+            if(!start)start=head;
+            head->pos=pos;
+            pos+=2;
+            //TODO?
+        }
+    }
+}
 
 int assemble(const char * in,const char * out){
     line_array arr=read_file_into_line_array(in);
