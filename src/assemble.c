@@ -160,8 +160,7 @@ static int is_valid_label(const char * str,int len){
 static int parse_label(const char * str,int line,label_data ** labels){
     int len=strlen(str);
     if(str[len-1]==':'){
-        char * temp=calloc(len,sizeof(char));
-        strncpy(temp,str,len-1);
+        char * temp=strlnmake(str,len);
         if(is_valid_label(temp,len)){
             if(!find_label_name(*labels,temp,len)){
                 (*labels)=add_label(*labels,line,temp);
@@ -172,6 +171,7 @@ static int parse_label(const char * str,int line,label_data ** labels){
         }else{
             printf("line %d: invalid label name '%s'",line,temp);
         }
+        free(temp);//fix invalid/duplicate label memory leak
     }
     return 0;//fail
 }
@@ -870,6 +870,11 @@ static uint8_t * parse_lines(line_array arr,size_t * size){//return unterminated
             }
             free(un_start->label_jump->label);
             free(un_start->label_jump);
+        }else{
+            ok=0;
+            printf("Unknown unresolved instruction in line %d\n",un_start->parent->line);
+            un_start=un_start->next;
+            continue;
         }
         unresolved_instruction * temp=un_start;
         un_start=un_start->next;
@@ -879,10 +884,30 @@ static uint8_t * parse_lines(line_array arr,size_t * size){//return unterminated
         int len=pos-0x200;
         if(len>0){
             uint8_t * data=calloc(len,sizeof(uint8_t));
-            printf("Assembler not implemented\n");
-            //TODO copy instructions into code array
+            int cur=0;
+            while(start!=NULL){
+                if(start->type==LINE_RESOLVED_INSTRUCTION){
+                    instruction_data temp={.whole=start->resolved->code};
+                    data[cur]=temp.section12;
+                    data[cur+1]=temp.section34;
+                    cur+=2;
+                    free(start->resolved);
+                }else if(start->type==LINE_UNRESOLVED_INSTRUCTION){
+                    ok=0;
+                    printf("Unresolved instruction in line %d\n",un_start->parent->line);
+                    free(start->unresolved);
+                }else if(start->type==LINE_LABEL){
+                    free(start->label->name);
+                    free(start->label);
+                }else{
+                    ok=0;
+                    printf("Unknown line data in line %d\n",un_start->parent->line);
+                }
+                line_data * temp=start;
+                start=start->next;
+                free(temp);
+            }
             *size=len;
-            //TODO free instruction data list
             return data;
         }else{
             printf("No valid instructions to be assembled\n");
@@ -894,6 +919,7 @@ static uint8_t * parse_lines(line_array arr,size_t * size){//return unterminated
 }
 
 int assemble(const char * in,const char * out){
+    printf("Reading '%s'\n",in);
     line_array arr=read_file_into_line_array(in);
     if(arr.data){
         for(int i=0;i<arr.lines;i++){
@@ -906,8 +932,10 @@ int assemble(const char * in,const char * out){
         FILE * f=fopen(out,"wb");
         if(f){
             size_t len;
+            printf("Assembling '%s'\n",in);
             uint8_t * data=parse_lines(arr,&len);
             if(data){
+                printf("Writing output to '%s'\n",out);
                 fwrite(data,sizeof(uint8_t),len,f);
                 free(data);
             }else{
