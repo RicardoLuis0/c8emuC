@@ -273,8 +273,8 @@ static line_data * add(line_data * parent,line_data * new) {
 }
 
 static int parse_line(const char * str1,int line,label_data * labels,line_data ** head) {
-    int ok=1;
     if(*str1!='\0') {
+        int ok=1;
         const char * str2=str1;
         while(*str2!='\0'&&*str2!=','&&*str2!=' '&&*str2!='\t') { //find first whitespace or end of string
             str2++;
@@ -1005,8 +1005,10 @@ static int parse_line(const char * str1,int line,label_data * labels,line_data *
             free(arg1);
         }
         free(op);
+        return ok;
+    }else{
+        return -1;
     }
-    return ok;
 }
 
 static uint8_t * parse_lines(line_array arr,size_t * size) { //return unterminated array with binary code, store array length in size
@@ -1032,23 +1034,28 @@ static uint8_t * parse_lines(line_array arr,size_t * size) { //return unterminat
             } else {
                 head=start=temp;
             }
-        } else if(parse_line(arr.data[i],i,labels,&head)) { //try to parse code line
-            if(!start) {
-                start=head;
-            }
-            head->pos=pos;
-            pos+=2;
-            head->unresolved->parent=head;
-            if(head->type==LINE_UNRESOLVED_INSTRUCTION) {
-                if(un_start) {
-                    un_head->next=head->unresolved;
-                    un_head=head->unresolved;
-                } else {
-                    un_head=un_start=head->unresolved;
+        } else{
+            int r=parse_line(arr.data[i],i,labels,&head);//try to parse code line
+            if(r==-1){
+                continue;
+            }else if(r==0){
+                ok=0;
+            }else{
+                if(!start) {
+                    start=head;
+                }
+                head->pos=pos;
+                pos+=2;
+                head->unresolved->parent=head;
+                if(head->type==LINE_UNRESOLVED_INSTRUCTION) {
+                    if(un_start) {
+                        un_head->next=head->unresolved;
+                        un_head=head->unresolved;
+                    } else {
+                        un_head=un_start=head->unresolved;
+                    }
                 }
             }
-        } else {
-            ok=0;
         }
     }
     while(un_start!=NULL) {
