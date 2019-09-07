@@ -859,13 +859,21 @@ static uint8_t * parse_lines(line_array arr,size_t * size){//return unterminated
         if(un_start->type==UNRESOLVED_LABEL_JUMP){
             label_data *label=find_label_name(labels,un_start->label_jump->label,strlen(un_start->label_jump->label));
             if(label){
-                //TODO resolve unresolved instructions (forwards label jumps)
+                line_data * dt=un_start->parent;
+                dt->type=LINE_RESOLVED_INSTRUCTION;
+                resolved_instruction * temp=calloc(1,sizeof(resolved_instruction));
+                temp->code=((instruction_data){.section1=un_start->label_jump->section1,.section234=label->position}).whole;
+                dt->resolved=temp;
             }else{
                 ok=0;
                 printf("Unknown label %s in line %d\n",un_start->label_jump->label,un_start->parent->line);
             }
+            free(un_start->label_jump->label);
+            free(un_start->label_jump);
         }
+        unresolved_instruction * temp=un_start;
         un_start=un_start->next;
+        free(temp);
     }
     if(ok){
         int len=pos-0x200;
@@ -874,6 +882,7 @@ static uint8_t * parse_lines(line_array arr,size_t * size){//return unterminated
             printf("Assembler not implemented\n");
             //TODO copy instructions into code array
             *size=len;
+            //TODO free instruction data list
             return data;
         }else{
             printf("No valid instructions to be assembled\n");
