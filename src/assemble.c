@@ -825,7 +825,7 @@ static uint8_t * parse_lines(line_array arr,size_t * size){//return unterminated
     int pos=0x200;
     for(int i=0;i<arr.lines;i++){
         if(parse_label(arr.data[i],i,&labels)){//try to parse label line
-            line_data * temp=calloc(0,sizeof(line_data));
+            line_data * temp=calloc(1,sizeof(line_data));
             labels->parent=temp;
             labels->position=pos;
             temp->type=LINE_LABEL;
