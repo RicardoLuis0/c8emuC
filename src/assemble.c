@@ -982,7 +982,7 @@ static int parse_line(const char * str1,int line,label_data * labels,line_data *
                                         printf("Invalid argument 3 for instruction 'DRW', number too large, max 0xF, got 0x%X\n",num);
                                     } else { //DRW VX,VY,N
                                         instruction_data inst;
-                                        inst.section1=0x8;
+                                        inst.section1=0xD;
                                         inst.section2=reg;
                                         inst.section3=reg2;
                                         inst.section4=num;
