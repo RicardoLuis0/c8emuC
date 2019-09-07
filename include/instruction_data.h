@@ -8,10 +8,10 @@ union _instruction_data{
     uint8_t bytes[2];
     struct{
         union{
-            uint8_t section34;
+            uint8_t section34:8;
         };
         union{
-            uint8_t section12;
+            uint8_t section12:8;
         };
     };
     struct{
@@ -20,7 +20,10 @@ union _instruction_data{
                 uint16_t section234:12;
             };
             struct{
-                uint8_t section4:4,section3:4,section2:4,section1:4;
+                uint8_t section4:4;
+                uint8_t section3:4;
+                uint8_t section2:4;
+                uint8_t section1:4;
             };
         };
     };
