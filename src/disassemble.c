@@ -1,10 +1,7 @@
 #include "disassemble.h"
 #include <stdio.h>
 
-disassembled_instruction disassemble_instruction(uint16_t rawbytes){
-    instruction_data inst={
-        .whole=rawbytes,
-    };
+disassembled_instruction disassemble_instruction(instruction_data inst){
     switch(inst.section1){
     case 0x0:
         switch(inst.section234){

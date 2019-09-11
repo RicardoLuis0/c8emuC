@@ -1158,5 +1158,41 @@ int assemble(const char * in,const char * out) {
 
 int disassemble(const char * in,const char * out) {
     printf("Disassembler not implemented\n");
-    return 0;
+    FILE * f=fopen(in,"rb");
+    if(f){
+        fseek(f,0,SEEK_END);
+        int len=ftell(f);
+        if(len%2!=0){
+            printf("ROM has odd number of bytes");
+            fclose(f);
+            return 1;
+        }
+        len/=2;
+        instruction_data * instructions=calloc(len,sizeof(instruction_data));
+        fseek(f,0,SEEK_SET);
+        if(fread(instructions,sizeof(instruction_data),len,f)!=len){
+            printf("could not read all instructions");
+            fclose(f);
+            free(instructions);
+            return 1;
+        }
+        fclose(f);
+        f=fopen(out,"wb");
+        if(f){
+            for(int i=0;i<len;i++){//scan for jumps/labels
+                
+            }
+            for(int i=0;i<len;i++){//write to file
+                
+            }
+            fclose(f);
+            return 0;
+        }else{
+            printf("Could not open file %s\n",out);
+            return 1;
+        }
+    }else{
+        printf("Could not open file %s\n",in);
+        return 1;
+    }
 }

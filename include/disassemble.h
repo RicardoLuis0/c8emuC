@@ -11,7 +11,7 @@ typedef struct _disassembled_instruction{
     instruction_data data;
 } disassembled_instruction;
 
-disassembled_instruction disassemble_instruction(uint16_t rawbytes);
+disassembled_instruction disassemble_instruction(instruction_data inst);
 void print_instruction(disassembled_instruction inst,char * into,size_t size);
 
 #endif // DISASSEMBLE_H_INCLUDED
