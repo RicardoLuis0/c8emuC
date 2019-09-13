@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "util.h"
+#include "disassemble.h"
 
 debug_data * new_debug_data(){
     debug_data * data=calloc(1,sizeof(debug_data));
@@ -58,7 +59,7 @@ static const char CMD_HELP [MAX_COMMAND][MAX_BUFFER]={
     "Turn On/Off Command Echoing",
     "Clear Terminal Screen",
     "Manage Breakpoints",
-    "View Registers/Memory/VRAM",
+    "View Registers/RAM",
 };
 
 static const char CMD_USAGE [MAX_COMMAND][MAX_BUFFER*5]={
@@ -72,7 +73,9 @@ static const char CMD_USAGE [MAX_COMMAND][MAX_BUFFER*5]={
     " 'break unset <location>'\n  - Unsets the breakpoint at 'location' in memory\n"
     " 'break clear'\n  - Unsets all breakpoints\n"
     " 'break list'\n  - Lists all breakpoints\n",//break
-    "TODO",//peek
+    "'peek reg'\n  - List register values\n"
+    " 'peek mem abs <start_location> <end_location>'\n  - Displays the contents of memory between 'start_location' and 'end_location'\n"
+    " 'peek mem rel <negative_offset> <positive_offset>'\n  - Displays the contents of memory with offsets from the PC location\n",//peek
 };
 
 int no_cmd(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
@@ -208,7 +211,58 @@ int cls(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
 }
 
 int peek(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
-    printf("TODO\n");
+    if(strcmp(cmd_data[1],"reg")==0){
+        printf("PC:0x%03X\n",data->cpu->PC);
+        printf("SP:0x%03X\n",data->cpu->SP);
+        printf("DT:0x%03X\n",data->cpu->DT);
+        printf("ST:0x%03X\n",data->cpu->ST);
+        printf("I:0x%03X\n",data->cpu->I);
+        for(uint8_t i=0;i<8;i++){
+            printf("V%X: 0x%03X, V%X: 0x%03X; KB '%X': %s, KB '%X': %s;\n",i,data->cpu->V[i],i+8,data->cpu->V[i+8],i,(data->cpu->KB[i]>0?"on ":"off"),i+8,(data->cpu->KB[i+8]>0?"on ":"off"));
+        }
+    }else if(strcmp(cmd_data[1],"mem")==0){
+        int rel=0;
+        if(strcmp(cmd_data[2],"abs")!=0){
+            if(strcmp(cmd_data[2],"rel")==0){
+                rel=1;
+            }else{
+                printf("Invalid arguments for 'peek'\n\nUsage:\n %s\n",CMD_USAGE[7]);
+                return 0;
+            }
+        }
+        int start=parse_number(cmd_data[3]);
+        int end=parse_number(cmd_data[4]);
+        if(start==-1||end==-1){
+            printf("'start_location' and 'end_location' must be valid decimal/hex numbers\n\nUsage:\n %s\n",CMD_USAGE[7]);
+            return 0;
+        }
+        if(start%2||end%2){
+            printf("'start_location' and 'end_location' must be even numbers\n\nUsage:\n %s\n",CMD_USAGE[7]);
+            return 0;
+        }
+        if(rel){
+            start=data->cpu->PC-start;
+            end=data->cpu->PC+end;
+        }else{
+            if(start>end){//make sure end is larger than start
+                printf("'start_location' must be lower than 'end_location'\n\nUsage:\n %s\n",CMD_USAGE[7]);
+                return 0;
+            }
+        }
+        if(start<0)start=0;
+        if(end>0xFFF)end=0xFFF;
+        printf("(0x%04X-0x%04X)\n",start,end);
+        instruction_data temp;
+        char buf[64];
+        for(int i=start;i<=end;i+=2){
+            temp.section12=data->cpu->RAM[i];
+            temp.section34=data->cpu->RAM[i+1];
+            get_instruction_str(disassemble_instruction(temp),buf,64);
+            printf("0x%04X - %s\n",i,buf);
+        }
+    }else{
+        printf("Invalid arguments for 'peek'\n\nUsage:\n %s\n",CMD_USAGE[7]);
+    }
     return 0;
 }
 
