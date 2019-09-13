@@ -37,7 +37,7 @@ static void split_cmd(const char cmd[MAX_BUFFER],char arr[MAX_ARGS][MAX_BUFFER])
     }
 }
 
-#define MAX_COMMAND 7
+#define MAX_COMMAND 8
 
 static const char CMD_STR [MAX_COMMAND][MAX_BUFFER]={
     "pause",//0
@@ -47,6 +47,7 @@ static const char CMD_STR [MAX_COMMAND][MAX_BUFFER]={
     "echo",//4
     "cls",//5
     "break",//6
+    "peek",//7
 };
 
 static const char CMD_HELP [MAX_COMMAND][MAX_BUFFER]={
@@ -57,19 +58,21 @@ static const char CMD_HELP [MAX_COMMAND][MAX_BUFFER]={
     "Turn On/Off Command Echoing",
     "Clear Terminal Screen",
     "Manage Breakpoints",
+    "View Registers/Memory/VRAM",
 };
 
 static const char CMD_USAGE [MAX_COMMAND][MAX_BUFFER*5]={
-    "'pause'",
-    "'resume'",
-    "'exit'",
-    "'help [command]'",
-    "'echo on|off'",
-    "'cls'",
+    "'pause'",//pause
+    "'resume'",//resume
+    "'exit'",//exit
+    "'help [command]'",//help
+    "'echo on|off'",//echo
+    "'cls'",//cls
     "'break set <location>'\n  - Sets a breakpoint at 'location' in memory\n"
     " 'break unset <location>'\n  - Unsets the breakpoint at 'location' in memory\n"
     " 'break clear'\n  - Unsets all breakpoints\n"
-    " 'break list'\n  - Lists all breakpoints\n",
+    " 'break list'\n  - Lists all breakpoints\n",//break
+    "TODO",//peek
 };
 
 int no_cmd(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
@@ -204,6 +207,11 @@ int cls(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
     return 0;
 }
 
+int peek(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
+    printf("TODO\n");
+    return 0;
+}
+
 typedef int (*cmd_fp)(debug_data*,const char[MAX_ARGS][MAX_BUFFER]);
 
 
@@ -215,6 +223,7 @@ static const cmd_fp CMD_FP [MAX_COMMAND]={
     echo,
     cls,
     break_cmd,
+    peek,
 };
 
 int find_command(const char cmd[MAX_BUFFER]){
