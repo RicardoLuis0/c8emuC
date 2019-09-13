@@ -38,7 +38,7 @@ static void split_cmd(const char cmd[MAX_BUFFER],char arr[MAX_ARGS][MAX_BUFFER])
     }
 }
 
-#define MAX_COMMAND 8
+#define MAX_COMMAND 9
 
 static const char CMD_STR [MAX_COMMAND][MAX_BUFFER]={
     "pause",//0
@@ -49,6 +49,7 @@ static const char CMD_STR [MAX_COMMAND][MAX_BUFFER]={
     "cls",//5
     "break",//6
     "peek",//7
+    "step",//8
 };
 
 static const char CMD_HELP [MAX_COMMAND][MAX_BUFFER]={
@@ -60,6 +61,7 @@ static const char CMD_HELP [MAX_COMMAND][MAX_BUFFER]={
     "Clear Terminal Screen",
     "Manage Breakpoints",
     "View Registers/RAM",
+    "Execute one Instruction",
 };
 
 static const char CMD_USAGE [MAX_COMMAND][MAX_BUFFER*5]={
@@ -76,6 +78,7 @@ static const char CMD_USAGE [MAX_COMMAND][MAX_BUFFER*5]={
     "'peek reg'\n  - List register values\n"
     " 'peek mem abs <start_location> <end_location>'\n  - Displays the contents of memory between 'start_location' and 'end_location'\n"
     " 'peek mem rel <negative_offset> <positive_offset>'\n  - Displays the contents of memory with offsets from the PC location\n",//peek
+    "'step'",//step
 };
 
 int no_cmd(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
@@ -266,6 +269,16 @@ int peek(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
     return 0;
 }
 
+int step(debug_data * data,const char cmd_data[MAX_ARGS][MAX_BUFFER]){
+    if(data->paused){
+        printf("Stepping one instruction\n");
+        execute_instruction(data->cpu);
+    }else{
+        printf("Program not paused, cannot step\n");
+    }
+    return 0;
+}
+
 typedef int (*cmd_fp)(debug_data*,const char[MAX_ARGS][MAX_BUFFER]);
 
 
@@ -278,6 +291,7 @@ static const cmd_fp CMD_FP [MAX_COMMAND]={
     cls,
     break_cmd,
     peek,
+    step,
 };
 
 int find_command(const char cmd[MAX_BUFFER]){

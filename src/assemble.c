@@ -40,9 +40,9 @@ int get_register_index(const char * s) {
     }else if(s[1]>='0'&&s[1]<='9'){
         return s[1]-'0';
     }else if(s[1]>='a'&&s[1]<='f'){
-        return (s[1]-'a')+9;
+        return (s[1]-'a')+10;
     }else if(s[1]>='A'&&s[1]<='F'){
-        return (s[1]-'A')+9;
+        return (s[1]-'A')+10;
     }else{
         return -1;
     }
