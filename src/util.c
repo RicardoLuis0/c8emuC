@@ -1,6 +1,7 @@
 #include "util.h"
 #include <string.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 char * strlncpy(char *dst, const char *src, size_t size){
     strncpy(dst,src,size-1);
