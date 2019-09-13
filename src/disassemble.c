@@ -145,116 +145,111 @@ disassembled_instruction disassemble_instruction(instruction_data inst){
 
 void get_instruction_str(disassembled_instruction inst,char * into,size_t size){
     switch(inst.type){
-    /*
-    case SYS: //SYS NNN
-        snprintf(into,size,"(0x%04X) SYS(NOP) 0x%03X\n",inst.data.whole,inst.data.section234);
-        break;
-    */
     case CLS: //CLS
-        snprintf(into,size,"(0x%04X) CLS\n",inst.data.whole);
+        snprintf(into,size,"CLS");
         break;
     case RET: //RET
-        snprintf(into,size,"(0x%04X) RET\n",inst.data.whole);
+        snprintf(into,size,"RET");
         break;
     case JMP: //JMP NNN
-        snprintf(into,size,"(0x%04X) JMP 0x%03X\n",inst.data.whole,inst.data.section234);
+        snprintf(into,size,"JMP 0x%03X",inst.data.section234);
         break;
     case JMP_V0: //JMP V0,NNN
-        snprintf(into,size,"(0x%04X) JMP V0, 0x%03X\n",inst.data.whole,inst.data.section234);
+        snprintf(into,size,"JMP V0, 0x%03X",inst.data.section234);
         break;
     case CALL: //CALL NNN
-        snprintf(into,size,"(0x%04X) CALL 0x%03X\n",inst.data.whole,inst.data.section234);
+        snprintf(into,size,"CALL 0x%03X",inst.data.section234);
         break;
     case SE: //SE VX,NN
-        snprintf(into,size,"(0x%04X) SE V%01X, 0x%02X\n",inst.data.whole,inst.data.section2,inst.data.section34);
+        snprintf(into,size,"SE V%01X, 0x%02X",inst.data.section2,inst.data.section34);
         break;
     case SE_REG: //SE VX,VY
-        snprintf(into,size,"(0x%04X) SE V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"SE V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case SNE: //SNE VX,NN
-        snprintf(into,size,"(0x%04X) SNE V%01X, 0x%02X\n",inst.data.whole,inst.data.section2,inst.data.section34);
+        snprintf(into,size,"SNE V%01X, 0x%02X",inst.data.section2,inst.data.section34);
         break;
     case SNE_REG: //SNE VX,VY
-        snprintf(into,size,"(0x%04X) SNE V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"SNE V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case MOV: //MOV VX,NN
-        snprintf(into,size,"(0x%04X) MOV V%01X, 0x%02X\n",inst.data.whole,inst.data.section2,inst.data.section34);
+        snprintf(into,size,"MOV V%01X, 0x%02X",inst.data.section2,inst.data.section34);
         break;
     case MOV_REG: //MOV VX,VY
-        snprintf(into,size,"(0x%04X) MOV V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"MOV V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case MOV_I: //MOV I,NNN
-        snprintf(into,size,"(0x%04X) MOV I, 0x%03X\n",inst.data.whole,inst.data.section234);
+        snprintf(into,size,"MOV I, 0x%03X",inst.data.section234);
         break;
     case MOV_REG_DT: //MOV VX,DT
-        snprintf(into,size,"(0x%04X) MOV V%01X, DT\n",inst.data.whole,inst.data.section2);
+        snprintf(into,size,"MOV V%01X, DT",inst.data.section2);
         break;
     case MOV_DT: //MOV DT,VX
-        snprintf(into,size,"(0x%04X) MOV DT, V%01X\n",inst.data.whole,inst.data.section2);
+        snprintf(into,size,"MOV DT, V%01X",inst.data.section2);
         break;
     case MOV_ST: //MOV ST,VX
-        snprintf(into,size,"(0x%04X) MOV ST, V%01X\n",inst.data.whole,inst.data.section2);
+        snprintf(into,size,"MOV ST, V%01X",inst.data.section2);
         break;
     case ADD: //ADD VX,NN
-        snprintf(into,size,"(0x%04X) ADD V%01X, 0x%02X\n",inst.data.whole,inst.data.section2,inst.data.section34);
+        snprintf(into,size,"ADD V%01X, 0x%02X",inst.data.section2,inst.data.section34);
         break;
     case ADD_REG: //ADD VX,VY
-        snprintf(into,size,"(0x%04X) ADD V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"ADD V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case ADD_I: //ADD I,VX
-        snprintf(into,size,"(0x%04X) ADD I, V%01X\n",inst.data.whole,inst.data.section2);
+        snprintf(into,size,"ADD I, V%01X",inst.data.section2);
         break;
     case OR: //OR VX,VY
-        snprintf(into,size,"(0x%04X) OR V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"OR V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case AND: //AND VX,VY
-        snprintf(into,size,"(0x%04X) AND V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"AND V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case XOR: //XOR VX,VY
-        snprintf(into,size,"(0x%04X) XOR V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"XOR V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case SUB: //SUB VX,VY
-        snprintf(into,size,"(0x%04X) SUB V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"SUB V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case SHR: //SHR VX,VY
-        snprintf(into,size,"(0x%04X) SHR V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"SHR V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case RSB: //RSB VX,VY
-        snprintf(into,size,"(0x%04X) RSB V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"RSB V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case SHL: //SHL VX,VY
-        snprintf(into,size,"(0x%04X) SHL V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"SHL V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case RND: //RND VX,NN
-        snprintf(into,size,"(0x%04X) RND V%01X, V%01X\n",inst.data.whole,inst.data.section2,inst.data.section3);
+        snprintf(into,size,"RND V%01X, V%01X",inst.data.section2,inst.data.section3);
         break;
     case DRW: //DRW VX,VY,N
-        snprintf(into,size,"(0x%04X) DRW V%01X, V%01X, 0x%01X\n",inst.data.whole,inst.data.section2,inst.data.section3,inst.data.section4);
+        snprintf(into,size,"DRW V%01X, V%01X, 0x%01X",inst.data.section2,inst.data.section3,inst.data.section4);
         break;
     case SKP: //SKP VX
-        snprintf(into,size,"(0x%04X) SKP V%01X\n",inst.data.whole,inst.data.section2);
+        snprintf(into,size,"SKP V%01X",inst.data.section2);
         break;
     case SNKP: //SNKP VX
-        snprintf(into,size,"(0x%04X) SNKP V%01X\n",inst.data.whole,inst.data.section2);
+        snprintf(into,size,"SNKP V%01X",inst.data.section2);
         break;
     case KEY: //KEY VX
-        snprintf(into,size,"(0x%04X) KEY V%01X\n",inst.data.whole,inst.data.section2);
+        snprintf(into,size,"KEY V%01X",inst.data.section2);
         break;
     case LDFNT: //LDFNT VX
-        snprintf(into,size,"(0x%04X) LDFNT V%01X\n",inst.data.whole,inst.data.section2);
+        snprintf(into,size,"LDFNT V%01X",inst.data.section2);
         break;
     case BCD: //BCD VX
-        snprintf(into,size,"(0x%04X) BCD V%01X\n",inst.data.whole,inst.data.section2);
+        snprintf(into,size,"BCD V%01X",inst.data.section2);
         break;
     case STR: //STR VX
-        snprintf(into,size,"(0x%04X) STR V%01X\n",inst.data.whole,inst.data.section2);
+        snprintf(into,size,"STR V%01X",inst.data.section2);
         break;
     case LDR: //LDR VX
-        snprintf(into,size,"(0x%04X) LDR V%01X\n",inst.data.whole,inst.data.section2);
+        snprintf(into,size,"LDR V%01X",inst.data.section2);
         break;
     default:
     case DATA:
-        snprintf(into,size,"(0x%04X) DATA 0x%04X\n",inst.data.whole,inst.data.whole);
+        snprintf(into,size,"DATA 0x%04X",inst.data.whole);
         break;
     }
 }

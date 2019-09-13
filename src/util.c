@@ -1,5 +1,6 @@
 #include "util.h"
 #include <string.h>
+#include <stdarg.h>
 
 char * strlncpy(char *dst, const char *src, size_t size){
     strncpy(dst,src,size-1);
@@ -7,8 +8,17 @@ char * strlncpy(char *dst, const char *src, size_t size){
     return dst;
 }
 
-char * strlnmake(const char *src, size_t size){
+char * strlncpymake(const char *src, size_t size){
     return strlncpy(calloc(size,sizeof(char)),src,size);
+}
+
+char * strlnprintfmake(const char * fmt,...){
+    va_list args;
+    va_start(args,fmt);
+    size_t len=vsnprintf(NULL,0,fmt,args);
+    char * buf=calloc(len+1,sizeof(char));
+    vsnprintf(buf,len+1,fmt,args);
+    return buf;
 }
 
 int parse_number(const char * str){

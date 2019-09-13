@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "instruction_data.h"
 #include "util.h"
+#include "disassemble.h"
 
 int is_hex_char(char c) {
     return (c>='0'&&c<='9')||(c>='a'&&c<='f')||(c>='A'&&c<='F');
@@ -32,14 +33,19 @@ int is_register(const char * s) {
 int get_register_index(const char * s) {
     if(!is_register(s)) {
         return -1;
-    }
-    if(s[1]=='\0') {
+    }else if(s[1]=='\0') {
+        return -1;
+    }else if(s[2]!='\0') {
+        return -1;
+    }else if(s[1]>='0'&&s[1]<='9'){
+        return s[1]-'0';
+    }else if(s[1]>='a'&&s[1]<='f'){
+        return (s[1]-'a')+9;
+    }else if(s[1]>='A'&&s[1]<='F'){
+        return (s[1]-'A')+9;
+    }else{
         return -1;
     }
-    if(s[1]=='0'&&s[2]=='x') {
-        return -1;
-    }
-    return parse_number(s+1);
 }
 
 typedef struct _file_line_info {
@@ -172,6 +178,16 @@ static label_data * find_label_name(label_data * labels,const char * name) {
     return NULL;//no label found
 }
 
+static label_data * find_label_pos(label_data * labels,int pos) {
+    while(labels!=NULL) {
+        if(labels->position==pos) {
+            return labels;//label found
+        }
+        labels=labels->next;
+    }
+    return NULL;//no label found
+}
+
 static int is_valid_label_start_char(char c) {
     return (c>='a'&&c<='z')||(c>='A'&&c<='Z')||c=='_';
 }
@@ -187,7 +203,7 @@ static int is_valid_label(const char * str,int len) {
 static int parse_label(const char * str,int line,label_data ** labels) {
     size_t len=strlen(str);
     if(str[len-1]==':') {
-        char * temp=strlnmake(str,len);
+        char * temp=strlncpymake(str,len);
         if(is_valid_label(temp,len)) {
             if(!find_label_name(*labels,temp)) {
                 (*labels)=add_label(*labels,line,temp);
@@ -243,7 +259,7 @@ typedef struct _line_data {
 static line_data * new_unresolved_jump(int section1,const char * name,int len,int line) {
     unresolved_label_jump_instruction * temp=calloc(1,sizeof(unresolved_label_jump_instruction));
     temp->len=len;
-    temp->label=strlnmake(name,len+1);
+    temp->label=strlncpymake(name,len+1);
     temp->section1=section1;
     unresolved_instruction * temp2=calloc(1,sizeof(unresolved_instruction));
     temp2->label_jump=temp;
@@ -280,7 +296,7 @@ static int parse_line(const char * str1,int line,label_data * labels,line_data *
             str2++;
         }
         int len1=str2-str1;
-        char * op=strlnmake(str1,len1+1);
+        char * op=strlncpymake(str1,len1+1);
         if(*str2=='\0') { //no argument instruction, skip empty lines
             if(strcmp("CLS",op)==0) { //CLS
                 instruction_data inst;
@@ -302,7 +318,7 @@ static int parse_line(const char * str1,int line,label_data * labels,line_data *
                 str3++;
             }
             int len2=str3-str2;
-            char * arg1=strlnmake(str2,len2+1);
+            char * arg1=strlncpymake(str2,len2+1);
             if(*str3=='\0') { //single argument instruction
                 if(strcmp("SYS",op)==0) { //SYS NNN
                     int num=parse_number(arg1);
@@ -513,7 +529,7 @@ static int parse_line(const char * str1,int line,label_data * labels,line_data *
                     str4++;
                 }
                 int len3=str4-str3;
-                char * arg2=strlnmake(str3,len3+1);
+                char * arg2=strlncpymake(str3,len3+1);
                 if(*str4=='\0') { //two argument instruction
                     if(strcmp("SE",op)==0) { //SE VX,NN | SE VX,VY
                         int reg=get_register_index(arg1);
@@ -597,8 +613,20 @@ static int parse_line(const char * str1,int line,label_data * labels,line_data *
                         if(strcmp("I",arg1)==0) {
                             int num=parse_number(arg2);
                             if(num==-1) {
-                                ok=0;
-                                printf("Invalid argument 2 for instruction 'MOV', expected number, got '%s'\n",arg2);
+                                if(is_valid_label(arg2,len3)) {
+                                    label_data * lbl=find_label_name(labels,arg2);
+                                    if(lbl) {
+                                        instruction_data inst;
+                                        inst.section1=0xA;
+                                        inst.section234=lbl->position;
+                                        *head=add(*head,new_resolved_inst(inst,line));
+                                    } else { //label not defined yet, add
+                                        *head=add(*head,new_unresolved_jump(0xA,arg2,len3,line));
+                                    }
+                                } else {
+                                    ok=0;
+                                    printf("Invalid argument 2 for instruction 'MOV', expected number, got '%s'\n",arg1);
+                                }
                             } else if(num>0xFFF) {
                                 ok=0;
                                 printf("Invalid argument 2 for instruction 'MOV', number too large, max 0xFFF, got 0x%X\n",num);
@@ -954,7 +982,7 @@ static int parse_line(const char * str1,int line,label_data * labels,line_data *
                         strend++;
                     }
                     int len4=strend-str4;
-                    char * arg3=strlnmake(str4,len4+1);
+                    char * arg3=strlncpymake(str4,len4+1);
                     if(*strend=='\0') { //three argument instruction
                         if(strcmp("DRW",op)==0) {
                             int reg=get_register_index(arg1);
@@ -1156,8 +1184,15 @@ int assemble(const char * in,const char * out) {
     }
 }
 
+static instruction_data as_instr(uint8_t start,uint8_t end){
+    instruction_data temp;
+    temp.section12=start;
+    temp.section34=end;
+    return temp;
+}
+
 int disassemble(const char * in,const char * out) {
-    printf("Disassembler not implemented\n");
+    //printf("Disassembler not implemented\n");
     FILE * f=fopen(in,"rb");
     if(f){
         fseek(f,0,SEEK_END);
@@ -1167,23 +1202,66 @@ int disassemble(const char * in,const char * out) {
             fclose(f);
             return 1;
         }
-        len/=2;
-        instruction_data * instructions=calloc(len,sizeof(instruction_data));
+        uint8_t * instructions=calloc(len,sizeof(uint8_t));
         fseek(f,0,SEEK_SET);
-        if(fread(instructions,sizeof(instruction_data),len,f)!=len){
+        if(fread(instructions,sizeof(uint8_t),len,f)!=len){
             printf("could not read all instructions");
             fclose(f);
             free(instructions);
             return 1;
         }
         fclose(f);
-        f=fopen(out,"wb");
+        f=fopen(out,"w");
         if(f){
-            for(int i=0;i<len;i++){//scan for jumps/labels
-                
+            label_data * labels=NULL;
+            for(int i=0;i<len;i+=2){//scan for jumps/labels
+                instruction_data instr=as_instr(instructions[i],instructions[i+1]);
+                switch(disassemble_instruction(instr).type){
+                case JMP:
+                case JMP_V0:
+                case CALL:
+                case MOV_I:
+                    if(instr.section234<=(len+0x200)&&!find_label_pos(labels,instr.section234)){
+                        labels=add_label(labels,instr.section234,strlnprintfmake("generated_label_0x%04X",instr.section234));
+                        labels->position=instr.section234;
+                    }
+                default:
+                    break;
+                }
             }
-            for(int i=0;i<len;i++){//write to file
-                
+            char buffer[64];
+            label_data * temp_label=NULL;
+            int i;
+            for(i=0;i<len;i+=2){//write to file
+                if((temp_label=find_label_pos(labels,i+0x200))!=NULL){
+                    fprintf(f,"%s:\n",temp_label->name);
+                }
+                instruction_data instr=as_instr(instructions[i],instructions[i+1]);
+                disassembled_instruction das=disassemble_instruction(instr);
+                if(instr.section234<=(len+0x200)){
+                    switch(das.type){
+                    case JMP:
+                        snprintf(buffer,64,"JMP generated_label_0x%04X",instr.section234);
+                        break;
+                    case JMP_V0:
+                        snprintf(buffer,64,"JMP V0, generated_label_0x%04X",instr.section234);
+                        break;
+                    case CALL:
+                        snprintf(buffer,64,"CALL generated_label_0x%04X",instr.section234);
+                        break;
+                    case MOV_I:
+                        snprintf(buffer,64,"MOV I, generated_label_0x%04X",instr.section234);
+                        break;
+                    default:
+                        get_instruction_str(das,buffer,64);
+                    }
+                }else{
+                    get_instruction_str(das,buffer,64);
+                }
+                fprintf(f,"%s;0x%04X\n",buffer,i+0x200);
+            }
+            if((temp_label=find_label_pos(labels,i+0x200))!=NULL){
+                fprintf(f,"%s:\n;0x%04X\n",temp_label->name,i+0x200);
             }
             fclose(f);
             return 0;

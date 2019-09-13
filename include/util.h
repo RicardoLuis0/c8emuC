@@ -5,7 +5,9 @@
 
 char * strlncpy(char *dst, const char *src, size_t size);
 
-char * strlnmake(const char *src, size_t size);
+char * strlncpymake(const char *src, size_t size);
+
+char * strlnprintfmake(const char * fmt,...);
 
 int parse_number(const char * str);
 
