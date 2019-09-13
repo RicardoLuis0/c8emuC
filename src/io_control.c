@@ -5,6 +5,10 @@
 
 #define VRAMPOS(x,y) ((y)*64+(x))
 
+#ifndef SCALE
+#define SCALE 20
+#endif
+
 static SDL_Renderer * renderer;
 static SDL_Window * window;
 
@@ -60,7 +64,7 @@ int init_io(){
         printf("Error.\n >Error while Initializing SDL: %s\n",SDL_GetError());
         return 0;
     }
-    SDL_CreateWindowAndRenderer(640,320,0,&window,&renderer);
+    SDL_CreateWindowAndRenderer(64*SCALE,32*SCALE,0,&window,&renderer);
     SDL_RenderPresent(renderer);
     return 1;
 }
@@ -68,13 +72,13 @@ int init_io(){
 void draw(CPU_info * cpu){
     SDL_SetRenderDrawColor(renderer,0,0,0,255);
     SDL_RenderClear(renderer);
-    SDL_Rect rect={.x=0,.y=0,.w=10,.h=10};
+    SDL_Rect rect={.x=0,.y=0,.w=SCALE,.h=SCALE};
     SDL_SetRenderDrawColor(renderer,255,255,255,255);
     for(int y=0;y<32;y++){
         for(int x=0;x<64;x++){
             if(cpu->VRAM[VRAMPOS(x,y)]!=0){
-                rect.x=x*10;
-                rect.y=y*10;
+                rect.x=x*SCALE;
+                rect.y=y*SCALE;
                 SDL_RenderFillRect(renderer,&rect);
             }
         }
