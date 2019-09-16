@@ -66,6 +66,7 @@
 			<Add option="-lmingw32" />
 			<Add option="-lSDL2main" />
 			<Add option="-lSDL2" />
+			<Add option="-lComdlg32" />
 		</Linker>
 		<Unit filename="include/assemble.h">
 			<Option compilerVar="CC" />

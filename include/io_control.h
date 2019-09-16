@@ -7,7 +7,7 @@ int check_time(int msdelay);
 
 int has_focus();
 
-int init_io();
+int init_io(int is_debug);
 
 void draw(CPU_info * cpu);
 

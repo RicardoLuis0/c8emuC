@@ -59,9 +59,16 @@ int has_focus(){
     return SDL_GetWindowFlags(window)&SDL_WINDOW_INPUT_FOCUS;
 }
 
-int init_io(){
+int init_io(int is_debug){
     if(SDL_Init(SDL_INIT_VIDEO)!=0){
-        printf("Error.\n >Error while Initializing SDL: %s\n",SDL_GetError());
+        #ifdef USE_GUI
+        if(!is_debug){
+            char buf[256];
+            snprintf(buf,255,"Error while Initializing SDL: %s ",SDL_GetError());
+            MessageBox(NULL,buf,"Fatal Error",MB_OK|MB_ICONERROR);
+        }
+        #endif // USE_GUI
+        printf("Error while Initializing SDL: %s\n",SDL_GetError());
         return 0;
     }
     SDL_CreateWindowAndRenderer(64*SCALE,32*SCALE,0,&window,&renderer);
