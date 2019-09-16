@@ -6,6 +6,8 @@
 
 #define VRAMPOS(x,y) ((y)*64+(x))
 
+#include "windows.h"
+
 #ifndef SCALE
 #define SCALE 20
 #endif
@@ -53,7 +55,7 @@ static SDL_Renderer * renderer;
 
 static SDL_Window * window;
 
-static int play_beep;
+static int sound_playing;
 
 int check_time(int msdelay){
     return (SDL_GetTicks()%msdelay)==0;
@@ -76,7 +78,7 @@ int init_io(int is_debug){
         printf("Error while Initializing SDL: %s\n",SDL_GetError());
         return 0;
     }
-    play_beep=0;
+    sound_playing=0;
     SDL_CreateWindowAndRenderer(64*SCALE,32*SCALE,0,&window,&renderer);
     SDL_RenderPresent(renderer);
     return 1;
@@ -99,8 +101,26 @@ void draw(CPU_info * cpu){
     SDL_RenderPresent(renderer);
 }
 
+void play_beep(){
+    if(!sound_playing){
+        PlaySound("beep.wav",NULL,SND_FILENAME|SND_LOOP|SND_ASYNC);
+        sound_playing=1;
+    }
+}
+
+void stop_beep(){
+    if(sound_playing){
+        PlaySound(NULL,NULL,0);
+        sound_playing=0;
+    }
+}
+
 int poll_io(CPU_info * cpu){
-    play_beep=(cpu->ST>0x2);//do sound
+    if(cpu->ST>0x2){
+        play_beep();
+    }else{
+        stop_beep();
+    }
     for(SDL_Event e;SDL_PollEvent(&e);){
         switch(e.type){
         case SDL_QUIT:
@@ -120,7 +140,7 @@ int poll_io(CPU_info * cpu){
 }
 
 int poll_noio(){
-    play_beep=0;//do sound
+    stop_beep();
     for(SDL_Event e;SDL_PollEvent(&e);){
         if(e.type==SDL_QUIT){
             return 1;

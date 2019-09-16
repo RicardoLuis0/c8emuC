@@ -68,6 +68,7 @@
 			<Add option="-lSDL2main" />
 			<Add option="-lSDL2" />
 			<Add option="-lComdlg32" />
+			<Add option="-lwinmm" />
 		</Linker>
 		<Unit filename="include/assemble.h">
 			<Option compilerVar="CC" />
