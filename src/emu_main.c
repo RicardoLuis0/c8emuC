@@ -8,6 +8,11 @@
 #include "io_control.h"
 #include "command_handler.h"
 
+#define _WIN32_WINNT 0x0601
+
+#define WIN32_LEAN_AND_MEAN
+#include "windows.h"
+
 void print_usage(){
     printf("usage:\n  c8emu [-debug] <ROM>");
 }
@@ -23,6 +28,7 @@ int execute(const char * filename){
             delete_cpu(cpu);
             return 1;
         }
+        ShowWindow(GetConsoleWindow(),SW_HIDE);
         while(1){
             if(!has_focus()){//if doesn't have focus, don't run cycle
                 if(poll_noio())break;
@@ -38,11 +44,14 @@ int execute(const char * filename){
             }
         }
         exit_io();
+        delete_cpu(cpu);
+        ShowWindow(GetConsoleWindow(),SW_SHOW);
+        return 0;
     }else{
         printf("Failed to load ROM (inexistent or too large)\n");
+        delete_cpu(cpu);
+        return 1;
     }
-    delete_cpu(cpu);
-    return 0;
 }
 
 int debug(const char * filename){
