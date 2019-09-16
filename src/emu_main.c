@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <conio.h>
+#include <time.h>
 #include "cpu.h"
 #include "io_control.h"
 #include "command_handler.h"
@@ -108,6 +109,7 @@ int debug(const char * filename){
 }
 
 int main(int argc,char ** argv){
+    srand(time(NULL));
     if(argc<2){
         printf("Too few arguments\n");
     }else if(argc==2){
