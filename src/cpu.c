@@ -286,7 +286,6 @@ void keyup(CPU_info * cpu, uint8_t key){
 void delay_tick(CPU_info * cpu){
     if(cpu->DT)cpu->DT--;
     if(cpu->ST){
-        printf("\a");//TODO replace with sdl sound stuff
         cpu->ST--;
     }
 }

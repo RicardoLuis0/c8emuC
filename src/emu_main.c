@@ -26,7 +26,7 @@ int openDialog(char * str,size_t len){
     ZeroMemory(str, sizeof(len));
     data.lpstrFile = str;
     data.nMaxFile = len;
-    data.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST;
+    data.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
     data.lpstrDefExt = "c8";
     data.lpstrInitialDir ="ROMS\\";
     return GetOpenFileNameA(&data);
@@ -169,13 +169,16 @@ int main(int argc,char ** argv){
         return execute(buf);
         #endif // USE_GUI
     }else if(argc==2){
-        #ifdef USE_GUI
+        #ifndef USE_GUI
         ShowWindow(GetConsoleWindow(),SW_HIDE);
         #endif
         //has file parameter, run emulator
         return execute(argv[1]);
     }else if(argc==3){
         if(strcmp(argv[1],"-debug")==0){
+            #ifdef USE_GUI
+            ShowWindow(GetConsoleWindow(),SW_SHOW);
+            #endif
             //has debug parameter, run emulator
             return debug(argv[2]);
         }else{
