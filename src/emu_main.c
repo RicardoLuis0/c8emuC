@@ -120,7 +120,11 @@ int debug(const char * filename){
 int main(int argc,char ** argv){
     srand(time(NULL));
     if(argc<2){
-        printf("Too few arguments\n");
+        char buf[256]={};
+        printf("Filename: ");
+        scanf("%255s",buf);
+        return execute(buf);
+        //printf("Too few arguments\n");
     }else if(argc==2){
         //has file parameter, run emulator
         return execute(argv[1]);
