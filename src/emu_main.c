@@ -9,11 +9,8 @@
 #include "command_handler.h"
 
 #define _WIN32_WINNT 0x0601
-
 //#define WIN32_LEAN_AND_MEAN
 #include "windows.h"
-
-#define USE_GUI
 
 void print_usage(){
     printf("usage:\n  c8emu [-debug] <ROM>");
@@ -38,7 +35,9 @@ int execute(const char * filename){
     int frame_time=1000/target_fps;
     int cpu_time=1000/target_ops;
     CPU_info * cpu=new_cpu();
+    #ifdef USE_GUI
 start:
+    #endif // USE_GUI
     if(load_program(cpu,filename)){
         if(!init_io(0)){
             #ifdef USE_GUI
