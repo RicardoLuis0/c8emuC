@@ -103,7 +103,7 @@ void draw(CPU_info * cpu){
 
 void play_beep(){
     if(!sound_playing){
-        PlaySound("beep.wav",NULL,SND_FILENAME|SND_LOOP|SND_ASYNC);
+        PlaySound("beep.wav",NULL,SND_FILENAME|SND_LOOP|SND_ASYNC|SND_NODEFAULT);
         sound_playing=1;
     }
 }
@@ -116,7 +116,7 @@ void stop_beep(){
 }
 
 int poll_io(CPU_info * cpu){
-    if(cpu->ST>0x2){
+    if(cpu->ST>=0x2){
         play_beep();
     }else{
         stop_beep();

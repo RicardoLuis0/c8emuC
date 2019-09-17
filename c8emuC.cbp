@@ -61,6 +61,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-std=c11" />
+			<Add option="-DUSE_GUI" />
 			<Add directory="include" />
 		</Compiler>
 		<Linker>
