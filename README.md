@@ -1,2 +1,3 @@
 # c8emuC
- rewrite of my chip 8 emulator in C
+
+CHIP-8 emulator, debugger, assembler and disassembler. Written in C.
